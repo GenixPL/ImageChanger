@@ -80,7 +80,7 @@
 				android:text="functional filters"
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
-				android:id="@+id/button5"/>
+				android:id="@+id/functionalFiltersButton"/>
 		<Button
 				android:layout_weight="1"
 				android:text="convolution filters"

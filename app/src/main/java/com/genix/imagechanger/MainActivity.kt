@@ -25,7 +25,10 @@ const val WRITE_REQUEST_CODE = 20
 class MainActivity : AppCompatActivity() {
 
 	private var defaultImage: Bitmap? = null
-	private var currentImage: Bitmap? = null
+
+	companion object {
+		var currentImage: Bitmap? = null
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -35,11 +38,21 @@ class MainActivity : AppCompatActivity() {
 		initButtons()
 	}
 
+	override fun onResume() {
+		super.onResume()
+		setImage()
+	}
+
 	private fun initButtons() {
 		importButton.setOnClickListener { importImage() }
+
 		saveButton.setOnClickListener { saveImageToInternalStorage() }
+
 		setDefaultButton.setOnClickListener { setCurrentImageAsDefault() }
+
 		importDefaultButton.setOnClickListener { setDefaultAsCurrent() }
+
+		functionalFiltersButton.setOnClickListener { moveToFunctionalFilters() }
 	}
 
 	private fun importImage() {
@@ -113,7 +126,15 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun moveToFunctionalFilters() {
+		if (currentImage == null) {
+			toast("There is no image currently")
 
+		} else {
+			val intent = Intent(this, FunctionalFiltersActivity::class.java)
+			startActivity(intent)
+		}
+	}
 
 
 	/* OTHER METHODS */

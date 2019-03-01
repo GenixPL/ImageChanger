@@ -10,8 +10,9 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_functional_filters.*
 
 
-const val BRIGHTNESS_CORRECTION_VALUE = -30f
-const val CONTRAST_LEVEL = 0.8f
+const val BRIGHTNESS = 30f
+const val CONTRAST = 1.25f
+const val GAMMA = 1.5f
 
 class FunctionalFiltersActivity : AppCompatActivity() {
 
@@ -32,6 +33,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 		inversionButton.setOnClickListener { BackgroundInversion().execute() }
 		brightnessButton.setOnClickListener { BackgroundBrightnessCorrection().execute() }
 		contrastButton.setOnClickListener { BackgroundContrastEnhancement().execute() }
+		gammaButton.setOnClickListener { BackgroundGammaCorrection().execute() }
 	}
 
 	private fun setImageView() {
@@ -72,7 +74,6 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			MainActivity.currentImage = result
 			setImageView()
 		}
-
 	}
 
 	inner class BackgroundBrightnessCorrection : AsyncTask<Void, Void, Bitmap>() {
@@ -88,7 +89,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			var aOut: Allocation = Allocation.createFromBitmap(rsContext, bitmap)
 
 			val brightnessCorrection = ScriptC_brightness(rsContext)
-			brightnessCorrection._brightness_correction_value = BRIGHTNESS_CORRECTION_VALUE
+			brightnessCorrection._brightness = BRIGHTNESS
 
 			brightnessCorrection.forEach_brightness_correction(aIn, aOut)
 			aOut.copyTo(bitmap)
@@ -115,7 +116,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
 			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
 			val contrast = ScriptC_contrast(rsContext)
-			contrast._contrast_level = CONTRAST_LEVEL
+			contrast._contrast = CONTRAST
 
 			contrast.forEach_contrast_enhancement(aIn, aOut)
 			aOut.copyTo(bitmap)
@@ -128,6 +129,32 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			MainActivity.currentImage = result
 			setImageView()
 		}
+	}
 
+	inner class BackgroundGammaCorrection : AsyncTask<Void, Void, Bitmap>() {
+
+		override fun doInBackground(vararg params: Void?): Bitmap {
+			var bitmap :Bitmap = Bitmap.createBitmap(
+				MainActivity.currentImage!!.width,
+				MainActivity.currentImage!!.height,
+				Bitmap.Config.ARGB_8888
+			)
+
+			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
+			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
+			val gamma = ScriptC_gamma(rsContext)
+			gamma._gamma = GAMMA
+
+			gamma.forEach_gamma_correction(aIn, aOut)
+			aOut.copyTo(bitmap)
+
+			return bitmap
+		}
+
+		override fun onPostExecute(result: Bitmap?) {
+			toast("Contrast enhancement is done")
+			MainActivity.currentImage = result
+			setImageView()
+		}
 	}
 }

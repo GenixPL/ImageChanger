@@ -2,12 +2,12 @@
 #pragma rs java_package_name(com.genix.imagechanger)
 
 
-float brightness_correction_value;
+float brightness;
 
 uchar4 RS_KERNEL brightness_correction(uchar4 in, uint32_t x, uint32_t y) {
     uchar4 out = in;
 
-	float r = in.r + brightness_correction_value;
+	float r = in.r + brightness;
 	if (r < 0)
 		out.r = 0;
 	else if (r > 255)
@@ -15,7 +15,7 @@ uchar4 RS_KERNEL brightness_correction(uchar4 in, uint32_t x, uint32_t y) {
 	else
         out.r = trunc(r);
 
-    float g = in.g + brightness_correction_value;
+    float g = in.g + brightness;
     if (g < 0)
     	out.g = 0;
     else if (g > 255)
@@ -23,7 +23,7 @@ uchar4 RS_KERNEL brightness_correction(uchar4 in, uint32_t x, uint32_t y) {
     else
         out.g = trunc(g);
 
-    float b = in.b + brightness_correction_value;
+    float b = in.b + brightness;
     if (b < 0)
         out.b = 0;
     else if (b > 255)

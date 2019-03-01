@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 		var currentImage: Bitmap? = null
 	}
 
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
@@ -69,6 +70,7 @@ class MainActivity : AppCompatActivity() {
 
 			var imageUri: Uri? = data?.data
 			currentImage = MediaStore.Images.Media.getBitmap(this.contentResolver, imageUri)
+			defaultImage = currentImage
 
 			setImage()
 		}
@@ -77,7 +79,8 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	private fun setImage() {
-		imageView.setImageBitmap(currentImage)
+		currentImageView.setImageBitmap(currentImage)
+		defaultImageView.setImageBitmap(defaultImage)
 	}
 
 	private fun setCurrentImageAsDefault() {
@@ -85,6 +88,7 @@ class MainActivity : AppCompatActivity() {
 			toast("There is no image currently")
 		} else {
 			defaultImage = currentImage
+			setImage()
 		}
 	}
 

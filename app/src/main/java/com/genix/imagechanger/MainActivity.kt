@@ -46,14 +46,11 @@ class MainActivity : AppCompatActivity() {
 
 	private fun initButtons() {
 		importButton.setOnClickListener { importImage() }
-
 		saveButton.setOnClickListener { saveImageToInternalStorage() }
-
 		setDefaultButton.setOnClickListener { setCurrentImageAsDefault() }
-
 		importDefaultButton.setOnClickListener { setDefaultAsCurrent() }
-
 		functionalFiltersButton.setOnClickListener { moveToFunctionalFilters() }
+		convolutionFiltersButton.setOnClickListener { moveToConvolutionFilters() }
 	}
 
 	private fun importImage() {
@@ -139,6 +136,18 @@ class MainActivity : AppCompatActivity() {
 			startActivity(intent)
 		}
 	}
+
+	private fun moveToConvolutionFilters() {
+		if (currentImage == null) {
+			toast("There is no image currently")
+
+		} else {
+			val intent = Intent(this, ConvolutionFiltersActivity::class.java)
+			startActivity(intent)
+		}
+	}
+
+
 
 
 	/* OTHER METHODS */

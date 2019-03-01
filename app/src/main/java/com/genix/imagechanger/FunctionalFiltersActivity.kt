@@ -152,7 +152,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 		}
 
 		override fun onPostExecute(result: Bitmap?) {
-			toast("Contrast enhancement is done")
+			toast("Gamma correction is done")
 			MainActivity.currentImage = result
 			setImageView()
 		}

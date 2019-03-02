@@ -18,6 +18,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 
 	private var rsContext : RenderScript? = null
 
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_functional_filters)

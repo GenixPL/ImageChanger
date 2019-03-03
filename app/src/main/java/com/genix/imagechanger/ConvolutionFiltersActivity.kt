@@ -1,5 +1,6 @@
 package com.genix.imagechanger
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
@@ -8,6 +9,7 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.Type
+import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_convolution_filters.*
 
@@ -25,33 +27,18 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 	private var pixels : IntArray? = null
 
 	/**
-	 * Array of weights assigned to each cell of matrix
-	 *
-	 * @default: 0.11 (1/9 - equally weighted)
-	 */
-	private var matrix: FloatArray? = null
-
-	/**
-	 * Divisor - value by which we divide colors received during computations
-	 */
-	private var divisor: Float? = null
-
-	/**
 	 * Width of matrix used in convolution filter
 	 */
-	private val matrixWidth : Int? = null
 	private var defaultMatrixWidth = 3
 
 	/**
 	 * Height of matrix used in convolution filter
 	 */
-	private var matrixHeight : Int? = null
 	private var defaultMatrixHeight = 3
 
 	/**
 	 * Offset - value added to each color
 	 */
-	private var offset : Float? = null
 	private var defaultOffset = 0
 
 	/**
@@ -59,8 +46,28 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 	 * e.g. [(x1) -1, (y1) -1, (x2) 0, (y2) -1, ...] means that for given (x, y) pixel we take following pixels into account
 	 * (x1, y1):(x+(-1), y+(-1)), (x2, y2):(x+(0), (y+(-1)), ...
 	 */
-	private var changesInCoordinatesToConsider : IntArray? = null
 	private var defaultChangesInCoordinatesToConsider = intArrayOf(-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1)
+
+	/**
+	 * Those fields are changed in EditCustomMatrixActivity
+	 */
+	companion object {
+
+		/**
+		 * Divisor - value by which we divide colors received during computations
+		 */
+		var divisor = 1.0f
+
+		/**
+		 * Array of weights assigned to each cell of matrix
+		 */
+		var matrix = floatArrayOf(1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f)
+
+		var matrixWidth = 3
+		var matrixHeight = 3
+		var offset = 0
+		var changesInCoordinatesToConsider = intArrayOf(-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1)
+	}
 
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +104,9 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 		sharpenButton.setOnClickListener { BackgroundSharpening().execute() }
 		edgeButton.setOnClickListener { BackgroundEdgeDetection().execute() }
 		embossButton.setOnClickListener { BackgroundEmbossing().execute() }
+
+		editCustomMatrixButton.setOnClickListener { startActivity(Intent(this, EditCustomMatrixActivity::class.java)) }
+		applyCustomButton.setOnClickListener { BackgroundCustom().execute() }
 	}
 
 
@@ -365,6 +375,60 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 
 		override fun onPostExecute(result: Bitmap?) {
 			toast("Embossing is done")
+			MainActivity.currentImage = result
+			setImageViewAndPixels()
+		}
+	}
+
+	inner class BackgroundCustom : AsyncTask<Void, Void, Bitmap>() {
+
+		override fun doInBackground(vararg params: Void?): Bitmap {
+			var bitmap : Bitmap = Bitmap.createBitmap(
+				MainActivity.currentImage!!.width,
+				MainActivity.currentImage!!.height,
+				Bitmap.Config.ARGB_8888
+			)
+
+			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
+			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
+			val convolution = ScriptC_convolution(rsContext)
+			convolution._bitmap_width = MainActivity.currentImage!!.width
+			convolution._bitmap_height = MainActivity.currentImage!!.height
+			convolution._matrix_width = matrixWidth
+			convolution._matrix_height = matrixHeight
+			convolution._offset = offset
+			convolution._divisor = divisor
+			//Log.d("TAG", "w:$matrixWidth, h:$matrixHeight, o:$offset, d:$divisor")
+
+			//assign pixels (from here) to *pixels in .rs
+			var pixelsBuilder = Type.Builder(rsContext, Element.I32(rsContext))
+			pixelsBuilder.setX(pixels!!.size)
+			var pixelsAlloc = Allocation.createTyped(rsContext, pixelsBuilder.create())
+			pixelsAlloc.copyFrom(pixels)
+			convolution.bind_pixels(pixelsAlloc)
+
+			//assign defaultChangesInCoordinatesToConsider (from here) to *changes_in_coordinates_to_consider in .rs
+			var changesBuilder = Type.Builder(rsContext, Element.I32(rsContext))
+			changesBuilder.setX(changesInCoordinatesToConsider.size)
+			var changesAlloc = Allocation.createTyped(rsContext, changesBuilder.create())
+			changesAlloc.copyFrom(changesInCoordinatesToConsider)
+			convolution.bind_changes_in_coordinates_to_consider(changesAlloc)
+
+			//assign matrix (from here) to *matrix in .rs
+			var matrixBuilder = Type.Builder(rsContext, Element.F32(rsContext))
+			matrixBuilder.setX(matrixHeight * matrixWidth)
+			var matrixAlloc = Allocation.createTyped(rsContext, matrixBuilder.create())
+			matrixAlloc.copyFrom(matrix)
+			convolution.bind_matrix(matrixAlloc)
+
+			convolution.forEach_convolution(aIn, aOut)
+			aOut.copyTo(bitmap)
+
+			return bitmap
+		}
+
+		override fun onPostExecute(result: Bitmap?) {
+			toast("Custom filtering is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
 		}

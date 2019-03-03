@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.renderscript.Allocation
 import android.renderscript.RenderScript
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_functional_filters.*
 
@@ -31,10 +32,25 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 	}
 
 	private fun initButtons() {
-		inversionButton.setOnClickListener { BackgroundInversion().execute() }
-		brightnessButton.setOnClickListener { BackgroundBrightnessCorrection().execute() }
-		contrastButton.setOnClickListener { BackgroundContrastEnhancement().execute() }
-		gammaButton.setOnClickListener { BackgroundGammaCorrection().execute() }
+		inversionButton.setOnClickListener {
+			BackgroundInversion().execute()
+			progressBar2.visibility = View.VISIBLE
+		}
+
+		brightnessButton.setOnClickListener {
+			BackgroundBrightnessCorrection().execute()
+			progressBar2.visibility = View.VISIBLE
+		}
+
+		contrastButton.setOnClickListener {
+			BackgroundContrastEnhancement().execute()
+			progressBar2.visibility = View.VISIBLE
+		}
+
+		gammaButton.setOnClickListener {
+			BackgroundGammaCorrection().execute()
+			progressBar2.visibility = View.VISIBLE
+		}
 	}
 
 	private fun setImageView() {
@@ -74,6 +90,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			toast("Inversion is done")
 			MainActivity.currentImage = result
 			setImageView()
+			progressBar2.visibility = View.INVISIBLE
 		}
 	}
 
@@ -102,6 +119,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			toast("Brightness correction is done")
 			MainActivity.currentImage = result
 			setImageView()
+			progressBar2.visibility = View.INVISIBLE
 		}
 	}
 
@@ -129,6 +147,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			toast("Contrast enhancement is done")
 			MainActivity.currentImage = result
 			setImageView()
+			progressBar2.visibility = View.INVISIBLE
 		}
 	}
 
@@ -156,6 +175,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			toast("Gamma correction is done")
 			MainActivity.currentImage = result
 			setImageView()
+			progressBar2.visibility = View.INVISIBLE
 		}
 	}
 }

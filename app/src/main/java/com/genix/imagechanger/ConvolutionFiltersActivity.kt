@@ -2,6 +2,7 @@ package com.genix.imagechanger
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.opengl.Visibility
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.Type
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_convolution_filters.*
 
@@ -99,14 +101,40 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 	}
 
 	private fun initButtons() {
-		blurButton.setOnClickListener { BackgroundBlur().execute() }
-		gaussianButton.setOnClickListener { BackgroundGaussianSmoothing().execute() }
-		sharpenButton.setOnClickListener { BackgroundSharpening().execute() }
-		edgeButton.setOnClickListener { BackgroundEdgeDetection().execute() }
-		embossButton.setOnClickListener { BackgroundEmbossing().execute() }
+		blurButton.setOnClickListener {
+			BackgroundBlur().execute()
+			progressBar.visibility = View.VISIBLE
+		}
 
-		editCustomMatrixButton.setOnClickListener { startActivity(Intent(this, EditCustomMatrixActivity::class.java)) }
-		applyCustomButton.setOnClickListener { BackgroundCustom().execute() }
+		gaussianButton.setOnClickListener {
+			BackgroundGaussianSmoothing().execute()
+			progressBar.visibility = View.VISIBLE
+		}
+
+		sharpenButton.setOnClickListener {
+			BackgroundSharpening().execute()
+			progressBar.visibility = View.VISIBLE
+		}
+
+		edgeButton.setOnClickListener {
+			BackgroundEdgeDetection().execute()
+			progressBar.visibility = View.VISIBLE
+		}
+
+		embossButton.setOnClickListener {
+			BackgroundEmbossing().execute()
+			progressBar.visibility = View.VISIBLE
+		}
+
+		applyCustomButton.setOnClickListener {
+			BackgroundCustom().execute()
+			progressBar.visibility = View.VISIBLE
+		}
+
+
+		editCustomMatrixButton.setOnClickListener {
+			startActivity(Intent(this, EditCustomMatrixActivity::class.java))
+		}
 	}
 
 
@@ -165,6 +193,7 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			toast("Blur is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
+			progressBar.visibility = View.INVISIBLE
 		}
 	}
 
@@ -218,6 +247,7 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			toast("Gaussian smoothing is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
+			progressBar.visibility = View.INVISIBLE
 		}
 	}
 
@@ -271,6 +301,7 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			toast("Sharpening is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
+			progressBar.visibility = View.INVISIBLE
 		}
 	}
 
@@ -324,6 +355,7 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			toast("Edge detection is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
+			progressBar.visibility = View.INVISIBLE
 		}
 	}
 
@@ -377,6 +409,7 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			toast("Embossing is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
+			progressBar.visibility = View.INVISIBLE
 		}
 	}
 
@@ -431,6 +464,7 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			toast("Custom filtering is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
+			progressBar.visibility = View.INVISIBLE
 		}
 	}
 }

@@ -13,13 +13,15 @@ import kotlinx.android.synthetic.main.activity_convolution_filters.*
 import kotlinx.android.synthetic.main.activity_functional_filters.*
 
 
-const val MATRIX_WIDTH = 3
-const val MATRIX_HEIGHT = 3
-
 class ConvolutionFiltersActivity : AppCompatActivity() {
 
 	private var rsContext : RenderScript? = null
 	private var pixels : IntArray? = null
+	private var divisors: FloatArray? = FloatArray(9) { 0.11f }
+	private var matrixWidth = 3
+	private var matrixHeight = 3
+	private var offset = 0
+
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -69,8 +71,11 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
 			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
 			val blur = ScriptC_blur(rsContext)
-			blur._width = MainActivity.currentImage!!.width
-			blur._height = MainActivity.currentImage!!.height
+			blur._bitmap_width = MainActivity.currentImage!!.width
+			blur._matrix_height = MainActivity.currentImage!!.height
+			blur._matrix_width = matrixWidth
+			blur._matrix_height = matrixHeight
+			blur._offset = offset
 
 			//assign pixels (from here) to *pixels in .rs
 			var intArrayBuilder = Type.Builder(rsContext, Element.I32(rsContext))
@@ -78,6 +83,13 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 			var pxAlloc = Allocation.createTyped(rsContext, intArrayBuilder.create())
 			pxAlloc.copyFrom(pixels)
 			blur.bind_pixels(pxAlloc)
+
+			//assign divisors (from here) to *divisors in .rs
+			var floatArrayBuilder = Type.Builder(rsContext, Element.F32(rsContext))
+			floatArrayBuilder.setX(divisors!!.size)
+			var divAlloc = Allocation.createTyped(rsContext, floatArrayBuilder.create())
+			divAlloc.copyFrom(divisors)
+			blur.bind_divisors(divAlloc)
 
 			blur.forEach_blur(aIn, aOut)
 			aOut.copyTo(bitmap)

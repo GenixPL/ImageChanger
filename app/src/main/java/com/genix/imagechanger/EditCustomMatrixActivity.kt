@@ -1,14 +1,20 @@
 package com.genix.imagechanger
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.ConditionVariable
 import android.text.Editable
+import android.text.InputType
+import android.text.Layout
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import kotlinx.android.synthetic.main.activity_edit_custom_matrix.*
 import kotlin.math.floor
 
@@ -46,7 +52,13 @@ class EditCustomMatrixActivity : AppCompatActivity() {
 			override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 				ConvolutionFiltersActivity.matrixWidth = ((position + 1) * 2) + 1
 				ConvolutionFiltersActivity.matrix = FloatArray(ConvolutionFiltersActivity.matrixWidth * ConvolutionFiltersActivity.matrixHeight) { 1f }
-				setAnchor(anchorEditText.text.toString().toInt())
+				if (ConvolutionFiltersActivity.matrixWidth * ConvolutionFiltersActivity.matrixHeight < anchorEditText.text.toString().toInt()) {
+					anchorEditText.setText("0")
+					toast("Anchor out of bounds")
+				} else {
+					setAnchor(anchorEditText.text.toString().toInt())
+				}
+				setMatrix()
 			}
 		}
 
@@ -57,6 +69,7 @@ class EditCustomMatrixActivity : AppCompatActivity() {
 				ConvolutionFiltersActivity.matrixHeight = ((position + 1) * 2) + 1
 				ConvolutionFiltersActivity.matrix = FloatArray(ConvolutionFiltersActivity.matrixWidth * ConvolutionFiltersActivity.matrixHeight) { 1f }
 				setAnchor(anchorEditText.text.toString().toInt())
+				setMatrix()
 			}
 		}
 	}
@@ -101,6 +114,7 @@ class EditCustomMatrixActivity : AppCompatActivity() {
 						anchorEditText.setText("0")
 					} else {
 						setAnchor(anchor)
+						setMatrix()
 					}
 				}
 			}
@@ -139,7 +153,55 @@ class EditCustomMatrixActivity : AppCompatActivity() {
 	}
 
 	private fun setMatrix() {
-		
+		matrixLayout.removeAllViews()
+
+		var i = 0
+		while (i < ConvolutionFiltersActivity.matrixHeight) {
+			var horizontalLayout = LinearLayout(this)
+			horizontalLayout.gravity = Gravity.HORIZONTAL_GRAVITY_MASK
+			horizontalLayout.layoutParams = LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				1f
+			)
+
+			var j = 0
+			while (j < ConvolutionFiltersActivity.matrixWidth) {
+				var editText = EditText(this)
+				editText.inputType = InputType.TYPE_NUMBER_FLAG_DECIMAL or InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_CLASS_NUMBER
+				editText.layoutParams = LinearLayout.LayoutParams(
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					1f
+				)
+				editText.setText(ConvolutionFiltersActivity.matrix[i * ConvolutionFiltersActivity.matrixWidth + j].toString())
+				editText.tag = i * ConvolutionFiltersActivity.matrixWidth + j
+
+				editText.addTextChangedListener(object : TextWatcher {
+					override fun afterTextChanged(p0: Editable?) {
+						if (p0.toString().isNotEmpty() && p0.toString() != "-") {
+							ConvolutionFiltersActivity.matrix[editText.tag.toString().toInt()] = p0.toString().toFloat()
+							Log.d("TAG", "matrix:${editText.tag.toString().toInt()} = ${ConvolutionFiltersActivity.matrix[editText.tag.toString().toInt()]}")
+						}
+					}
+
+					override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+					override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+				})
+
+				if ((i * ConvolutionFiltersActivity.matrixWidth) + j == anchorEditText.text.toString().toInt()) {
+					editText.setBackgroundColor(Color.parseColor("#ff00ddff"))
+				}
+
+				horizontalLayout.addView(editText)
+
+				j++
+			}
+
+			matrixLayout.addView(horizontalLayout)
+
+			i++
+		}
 	}
 
 

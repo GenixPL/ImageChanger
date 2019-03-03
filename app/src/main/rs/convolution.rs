@@ -49,27 +49,30 @@ uchar4 RS_KERNEL convolution(uchar4 in, uint32_t x, uint32_t y) {
 	/* DEBUG SECTION */
 
 //	if (x < 5 && y < 2) {
-//      rsDebug("RS_TAG: values from in:", in);
+//		rsDebug("RS_TAG: values from in:", in);
 //
 //		int c = pixels[x + (y * bitmap_width)];
 //	    uchar4 out;
 //		out.r = (c >> 16) & 0xFF; //take second 8 bits
 //		out.g = (c >> 8) & 0xFF; //take third 8 bits
-//      out.b = (c >> 0) & 0xFF; //take last 8 bits
-//      out.a = (c >> 24) & 0xFF; //take first 8 bits
+//		out.b = (c >> 0) & 0xFF; //take last 8 bits
+//		out.a = (c >> 24) & 0xFF; //take first 8 bits
 //	    rsDebug("RS_TAG: values from pixels:", out);
 //	    rsDebug("RS_TAG: ", 0);
 //
 //	    rsDebug("RS_TAG: first two values from changes:", changes_in_coordinates_to_consider[0], changes_in_coordinates_to_consider[1]);
 //	    rsDebug("RS_TAG: ", 0);
 //
-//	    rsDebug("RS_TAG: first two values from divisors", divisors[0], divisors[1]);
+//	    rsDebug("RS_TAG: first two values from matrix", matrix[0], matrix[1]);
 //	    rsDebug("RS_TAG: ------------", 0);
 //	}
 
 
 
 	/* PROPER SCRIPT */
+	int r = 0;
+	int g = 0;
+	int b = 0;
 
 	for(int i = 0; i < matrix_height * matrix_width; i++) {
 		//get current x
@@ -80,60 +83,52 @@ uchar4 RS_KERNEL convolution(uchar4 in, uint32_t x, uint32_t y) {
 		//check if current x and y are in bounds of bitmap
 		if ((x_i < 0 || x_i > bitmap_width) || (y_i < 0 || y_i > bitmap_height)) {
 			//are out of bounds - use (x, y) from in
-
-			out.r += trunc((offset + (in.r * matrix[i])) / divisor);
-            //check bounds
-            if (out.r < 0)
-                out.r = 0;
-            else if (out.r > 255)
-            	out.r = 255;
-
-			out.g += trunc((offset + (in.g * matrix[i])) / divisor);
-			//check bounds
-			if (out.g < 0)
-				out.g = 0;
-			else if (out.g > 255)
-				out.g = 255;
-
-			out.b += trunc((offset + (in.b * matrix[i])) / divisor);
-			//check bounds
-			if (out.b < 0)
-				out.b = 0;
-			else if (out.b > 255)
-				out.b = 255;
+			r += in.r * matrix[i];
+			g += in.g * matrix[i];
+			b += in.b * matrix[i];
 
 		} else {
 			//are in bounds - use (x_i, y_i)
 			int px = pixels[x_i + (y_i * bitmap_width)];
 
 			//get red color
-			int r = (px >> 16) & 0xFF;
-			out.r += trunc((offset + (r * matrix[i])) / divisor);
-			//check bounds
-			if (out.r < 0)
-				out.r = 0;
-			else if (out.r > 255)
-				out.r = 255;
+			int r_col = (px >> 16) & 0xFF;
+			r += r_col * matrix[i];
 
 			//get green color
-			int g = (px >> 8) & 0xFF;
-			out.g += trunc((offset + (g * matrix[i])) / divisor);
-			//check bounds
-            if (out.g < 0)
-                out.g = 0;
-            else if (out.g > 255)
-            	out.g = 255;
+			int g_col = (px >> 8) & 0xFF;
+			g += g_col * matrix[i];
 
 			//get blue color
-			int b = (px >> 0) & 0xFF;
-			out.b += trunc((offset + (b * matrix[i])) / divisor);
-			//check bounds
-            if (out.b < 0)
-            	out.b = 0;
-            else if (out.b > 255)
-            	out.b = 255;
+			int b_col = (px >> 0) & 0xFF;
+			b += b_col * matrix[i];
 		}
 	}
+
+	r = offset + trunc(r / divisor);
+	g = offset + trunc(g / divisor);
+	b = offset + trunc(b / divisor);
+
+	if (r < 0)
+		out.r = 0;
+	else if (r > 255)
+		out.r = 255;
+	else
+		out.r = r;
+
+	if (g < 0)
+		out.g = 0;
+	else if (g > 255)
+		out.g = 255;
+	else
+		out.g = g;
+
+	if (b < 0)
+		out.b = 0;
+	else if (b > 255)
+		out.b = 255;
+	else
+		out.b = b;
 
     return out;
 }

@@ -51,7 +51,7 @@
 			app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"
 			app:layout_constraintBottom_toBottomOf="parent" android:id="@+id/linearLayout6">
 		<Button
-				android:text="embossButton"
+				android:text="embossing"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:id="@+id/embossButton"

@@ -27,12 +27,12 @@
                 android:text="inversion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/inversionButton" android:layout_weight="1"
-                android:textSize="12sp"/>
+                android:textSize="12sp" style="@style/Widget.AppCompat.Button.Borderless"/>
         <Button
                 android:text="brightness correction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:layout_weight="1" android:textSize="12sp"
-                android:id="@+id/brightnessButton"/>
+                android:id="@+id/brightnessButton" style="@style/Widget.AppCompat.Button.Borderless"/>
     </LinearLayout>
     <LinearLayout
             android:orientation="horizontal"
@@ -45,11 +45,11 @@
                 android:text="contrast enhancement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/contrastButton" android:layout_weight="1"
-                android:textSize="12sp"/>
+                android:textSize="12sp" style="@style/Widget.AppCompat.Button.Borderless"/>
         <Button
                 android:text="gamma correction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/gammaButton" android:layout_weight="1"
-                android:textSize="12sp"/>
+                android:textSize="12sp" style="@style/Widget.AppCompat.Button.Borderless"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

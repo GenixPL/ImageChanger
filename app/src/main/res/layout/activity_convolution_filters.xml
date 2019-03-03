@@ -22,7 +22,7 @@
 			app:layout_constraintWidth_percent="0.5"
 			app:layout_constraintBottom_toTopOf="@+id/sharpenButton" app:layout_constraintStart_toStartOf="parent"
 			android:layout_marginStart="8dp" android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintHorizontal_bias="0.0"/>
+			app:layout_constraintHorizontal_bias="0.0" style="@style/Widget.AppCompat.Button.Borderless"/>
 	<Button
 			android:text="sharpening"
 			android:layout_width="0dp"
@@ -32,7 +32,8 @@
 			app:layout_constraintStart_toStartOf="parent"
 			android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
 			app:layout_constraintHorizontal_bias="0.0"
-			app:layout_constraintBottom_toTopOf="@+id/edgeButton" android:layout_marginBottom="8dp"/>
+			app:layout_constraintBottom_toTopOf="@+id/edgeButton" android:layout_marginBottom="8dp"
+			style="@style/Widget.AppCompat.Button.Borderless"/>
 	<Button
 			android:text="blur"
 			android:layout_width="0dp"
@@ -40,9 +41,10 @@
 			android:id="@+id/blurButton"
 			app:layout_constraintWidth_percent="0.5"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="323dp"
+			app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
 			android:layout_marginStart="8dp" app:layout_constraintHorizontal_bias="0.0"
-			android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/gaussianButton"/>
+			android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/gaussianButton"
+			style="@style/Widget.AppCompat.Button.Borderless"/>
 	<Button
 			android:text="embossing"
 			android:layout_width="0dp"
@@ -52,7 +54,7 @@
 			android:layout_weight="1" android:layout_marginBottom="8dp"
 			app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
 			android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-			app:layout_constraintHorizontal_bias="0.0"/>
+			app:layout_constraintHorizontal_bias="0.0" style="@style/Widget.AppCompat.Button.Borderless"/>
 	<Button
 			android:text="edge detection"
 			android:layout_width="0dp"
@@ -62,14 +64,15 @@
 			android:layout_weight="1" android:layout_marginBottom="8dp"
 			app:layout_constraintBottom_toTopOf="@+id/embossButton" app:layout_constraintStart_toStartOf="parent"
 			android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-			app:layout_constraintHorizontal_bias="0.0"/>
+			app:layout_constraintHorizontal_bias="0.0" style="@style/Widget.AppCompat.Button.Borderless"/>
 	<Button
 			android:text="apply custom"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/applyCustomButton" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
 			app:layout_constraintStart_toEndOf="@+id/sharpenButton" android:layout_marginStart="8dp"
-			android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="@+id/edgeButton"/>
+			android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="@+id/edgeButton"
+			style="@style/Widget.AppCompat.Button.Borderless"/>
 	<Button
 			android:text="edit custom matrix"
 			android:layout_width="wrap_content"
@@ -77,5 +80,5 @@
 			android:id="@+id/editCustomMatrixButton" android:layout_marginBottom="8dp"
 			app:layout_constraintBottom_toTopOf="@+id/applyCustomButton" app:layout_constraintEnd_toEndOf="parent"
 			android:layout_marginEnd="8dp" app:layout_constraintStart_toEndOf="@+id/sharpenButton"
-			android:layout_marginStart="8dp"/>
+			android:layout_marginStart="8dp" style="@style/Widget.AppCompat.Button.Borderless"/>
 </android.support.constraint.ConstraintLayout>

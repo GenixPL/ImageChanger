@@ -21,13 +21,13 @@
 				android:layout_weight="1"
 				android:layout_height="wrap_content"
 				android:id="@+id/importButton"
-				android:layout_width="match_parent"/>
+				android:layout_width="match_parent" style="@style/Widget.AppCompat.Button.Borderless"/>
 		<Button
 				android:text="Save"
 				android:layout_weight="1"
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
-				android:id="@+id/saveButton"/>
+				android:id="@+id/saveButton" style="@style/Widget.AppCompat.Button.Borderless"/>
 	</LinearLayout>
 
 	<LinearLayout
@@ -43,13 +43,13 @@
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
 				android:text="import default"
-				android:id="@+id/importDefaultButton"/>
+				android:id="@+id/importDefaultButton" style="@style/Widget.AppCompat.Button.Borderless"/>
 		<Button
 				android:layout_weight="1"
 				android:text="set as default"
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
-				android:id="@+id/setDefaultButton"/>
+				android:id="@+id/setDefaultButton" style="@style/Widget.AppCompat.Button.Borderless"/>
 	</LinearLayout>
 
 	<LinearLayout
@@ -66,13 +66,13 @@
 				android:text="functional filters"
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
-				android:id="@+id/functionalFiltersButton"/>
+				android:id="@+id/functionalFiltersButton" style="@style/Widget.AppCompat.Button.Borderless"/>
 		<Button
 				android:layout_weight="1"
 				android:text="convolution filters"
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
-				android:id="@+id/convolutionFiltersButton"/>
+				android:id="@+id/convolutionFiltersButton" style="@style/Widget.AppCompat.Button.Borderless"/>
 	</LinearLayout>
 
 	<android.support.constraint.ConstraintLayout

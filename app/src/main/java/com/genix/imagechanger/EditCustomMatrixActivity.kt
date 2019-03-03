@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.ConditionVariable
+import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.InputType
 import android.text.Layout
@@ -175,6 +176,7 @@ class EditCustomMatrixActivity : AppCompatActivity() {
 					1f
 				)
 				editText.setText(ConvolutionFiltersActivity.matrix[i * ConvolutionFiltersActivity.matrixWidth + j].toString())
+				editText.gravity = Gravity.CENTER
 				editText.tag = i * ConvolutionFiltersActivity.matrixWidth + j
 
 				editText.addTextChangedListener(object : TextWatcher {
@@ -190,7 +192,7 @@ class EditCustomMatrixActivity : AppCompatActivity() {
 				})
 
 				if ((i * ConvolutionFiltersActivity.matrixWidth) + j == anchorEditText.text.toString().toInt()) {
-					editText.setBackgroundColor(Color.parseColor("#ff00ddff"))
+					editText.background = ContextCompat.getDrawable(this, R.drawable.anchor)
 				}
 
 				horizontalLayout.addView(editText)

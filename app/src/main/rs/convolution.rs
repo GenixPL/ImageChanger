@@ -38,7 +38,7 @@ float divisor;
 float *matrix;
 
 
-uchar4 RS_KERNEL blur(uchar4 in, uint32_t x, uint32_t y) {
+uchar4 RS_KERNEL convolution(uchar4 in, uint32_t x, uint32_t y) {
 	uchar4 out;
 	out.r = 0;
 	out.g = 0;

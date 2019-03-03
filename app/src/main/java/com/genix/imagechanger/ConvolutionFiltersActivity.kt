@@ -8,10 +8,12 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.Type
-import android.util.Half.toFloat
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_convolution_filters.*
 
+
+const val SHARPEN_A = 1
+const val SHARPEN_B = 5
 
 class ConvolutionFiltersActivity : AppCompatActivity() {
 
@@ -30,42 +32,38 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 	 *
 	 * @default: 0.11 (1/9 - equally weighted)
 	 */
-	private var matrix: FloatArray = FloatArray(9) { 0.111111f }
+	private var matrix: FloatArray? = null
 
 	/**
 	 * Divisor - value by which we divide colors received during computations
 	 */
-	private var divisor: Float = 1f
+	private var divisor: Float? = null
 
 	/**
 	 * Width of matrix used in convolution filter
-	 *
-	 * @default: 3
 	 */
-	private var matrixWidth = 3
+	private val matrixWidth : Int? = null
+	private var defaultMatrixWidth = 3
 
 	/**
 	 * Height of matrix used in convolution filter
-	 *
-	 * @default: 3
 	 */
-	private var matrixHeight = 3
+	private var matrixHeight : Int? = null
+	private var defaultMatrixHeight = 3
 
 	/**
 	 * Offset - value added to each color
-	 *
-	 *  @default: 0
 	 */
-	private var offset = 0
+	private var offset : Float? = null
+	private var defaultOffset = 0
 
 	/**
-	 * Array of changes in coordinates (looking from anchor point of view) which should be used for given matrix
+	 * Array of default (3x3 matrix) changes in coordinates (looking from anchor point of view) which should be used for given matrix
 	 * e.g. [(x1) -1, (y1) -1, (x2) 0, (y2) -1, ...] means that for given (x, y) pixel we take following pixels into account
 	 * (x1, y1):(x+(-1), y+(-1)), (x2, y2):(x+(0), (y+(-1)), ...
-	 *
-	 * @default: 3x3 matrix with anchor in the middle
 	 */
-	private var changesInCoordinatesToConsider = intArrayOf(-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1)
+	private var changesInCoordinatesToConsider : IntArray? = null
+	private var defaultChangesInCoordinatesToConsider = intArrayOf(-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1)
 
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,6 +96,8 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 
 	private fun initButtons() {
 		blurButton.setOnClickListener { BackgroundBlur().execute() }
+		gaussianButton.setOnClickListener { BackgroundGaussianSmoothing().execute() }
+		sharpenButton.setOnClickListener { BackgroundSharpening().execute() }
 	}
 
 
@@ -117,36 +117,36 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 
 			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
 			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
-			val blur = ScriptC_blur(rsContext)
+			val blur = ScriptC_convolution(rsContext)
 			blur._bitmap_width = MainActivity.currentImage!!.width
 			blur._bitmap_height = MainActivity.currentImage!!.height
-			blur._matrix_width = matrixWidth
-			blur._matrix_height = matrixHeight
-			blur._offset = offset
-			blur._divisor = (matrixWidth * matrixHeight).toFloat() //in case of blur it's width*height
+			blur._matrix_width = defaultMatrixWidth
+			blur._matrix_height = defaultMatrixHeight
+			blur._offset = defaultOffset
+			blur._divisor = 9f //in case of default blur it's 9
 
-			//assign pixels (from here) to *pixels in blur.rs
+			//assign pixels (from here) to *pixels in convolution.rs
 			var pixelsBuilder = Type.Builder(rsContext, Element.I32(rsContext))
 			pixelsBuilder.setX(pixels!!.size)
 			var pixelsAlloc = Allocation.createTyped(rsContext, pixelsBuilder.create())
 			pixelsAlloc.copyFrom(pixels)
 			blur.bind_pixels(pixelsAlloc)
 
-			//assign changesInCoordinatesToConsider (from here) to *changes_in_coordinates_to_consider in blur.rs
+			//assign defaultChangesInCoordinatesToConsider (from here) to *changes_in_coordinates_to_consider in convolution.rs
 			var changesBuilder = Type.Builder(rsContext, Element.I32(rsContext))
-			changesBuilder.setX(changesInCoordinatesToConsider.size)
+			changesBuilder.setX(defaultChangesInCoordinatesToConsider.size)
 			var changesAlloc = Allocation.createTyped(rsContext, changesBuilder.create())
-			changesAlloc.copyFrom(changesInCoordinatesToConsider)
+			changesAlloc.copyFrom(defaultChangesInCoordinatesToConsider)
 			blur.bind_changes_in_coordinates_to_consider(changesAlloc)
 
-			//assign matrix (from here) to *matrix in blur.rs
+			//assign matrix (from here) to *matrix in convolution.rs
 			var matrixBuilder = Type.Builder(rsContext, Element.F32(rsContext))
-			matrixBuilder.setX(matrixHeight * matrixWidth)
+			matrixBuilder.setX(defaultMatrixHeight * defaultMatrixWidth)
 			var matrixAlloc = Allocation.createTyped(rsContext, matrixBuilder.create())
-			matrixAlloc.copyFrom(FloatArray(matrixHeight * matrixWidth) { 1f }) //in case of blur matrix consists of ones
+			matrixAlloc.copyFrom(FloatArray(9) { 1f }) //in case of default blur matrix consists of ones
 			blur.bind_matrix(matrixAlloc)
 
-			blur.forEach_blur(aIn, aOut)
+			blur.forEach_convolution(aIn, aOut)
 			aOut.copyTo(bitmap)
 
 			return bitmap
@@ -154,6 +154,115 @@ class ConvolutionFiltersActivity : AppCompatActivity() {
 
 		override fun onPostExecute(result: Bitmap?) {
 			toast("Blur is done")
+			MainActivity.currentImage = result
+			setImageViewAndPixels()
+		}
+	}
+
+	inner class BackgroundGaussianSmoothing : AsyncTask<Void, Void, Bitmap>() {
+
+		override fun doInBackground(vararg params: Void?): Bitmap {
+			var bitmap : Bitmap = Bitmap.createBitmap(
+				MainActivity.currentImage!!.width,
+				MainActivity.currentImage!!.height,
+				Bitmap.Config.ARGB_8888
+			)
+
+			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
+			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
+			val blur = ScriptC_convolution(rsContext)
+			blur._bitmap_width = MainActivity.currentImage!!.width
+			blur._bitmap_height = MainActivity.currentImage!!.height
+			blur._matrix_width = defaultMatrixWidth
+			blur._matrix_height = defaultMatrixHeight
+			blur._offset = defaultOffset
+			blur._divisor = 8f //in case of default gaussian smoothing it's 8
+
+			//assign pixels (from here) to *pixels in convolution.rs
+			var pixelsBuilder = Type.Builder(rsContext, Element.I32(rsContext))
+			pixelsBuilder.setX(pixels!!.size)
+			var pixelsAlloc = Allocation.createTyped(rsContext, pixelsBuilder.create())
+			pixelsAlloc.copyFrom(pixels)
+			blur.bind_pixels(pixelsAlloc)
+
+			//assign defaultChangesInCoordinatesToConsider (from here) to *changes_in_coordinates_to_consider in convolution.rs
+			var changesBuilder = Type.Builder(rsContext, Element.I32(rsContext))
+			changesBuilder.setX(defaultChangesInCoordinatesToConsider.size)
+			var changesAlloc = Allocation.createTyped(rsContext, changesBuilder.create())
+			changesAlloc.copyFrom(defaultChangesInCoordinatesToConsider)
+			blur.bind_changes_in_coordinates_to_consider(changesAlloc)
+
+			//assign matrix (from here) to *matrix in convolution.rs
+			var matrixBuilder = Type.Builder(rsContext, Element.F32(rsContext))
+			matrixBuilder.setX(defaultMatrixHeight * defaultMatrixWidth)
+			var matrixAlloc = Allocation.createTyped(rsContext, matrixBuilder.create())
+			matrixAlloc.copyFrom(floatArrayOf(0f, 1f, 0f, 1f, 4f, 1f, 0f, 1f, 0f)) //in case of default gaussian smoothing matrix consists of ones
+			blur.bind_matrix(matrixAlloc)
+
+			blur.forEach_convolution(aIn, aOut)
+			aOut.copyTo(bitmap)
+
+			return bitmap
+		}
+
+		override fun onPostExecute(result: Bitmap?) {
+			toast("Gaussian smoothing is done")
+			MainActivity.currentImage = result
+			setImageViewAndPixels()
+		}
+	}
+
+	inner class BackgroundSharpening : AsyncTask<Void, Void, Bitmap>() {
+
+		override fun doInBackground(vararg params: Void?): Bitmap {
+			var bitmap : Bitmap = Bitmap.createBitmap(
+				MainActivity.currentImage!!.width,
+				MainActivity.currentImage!!.height,
+				Bitmap.Config.ARGB_8888
+			)
+
+			val def1 = -1f * SHARPEN_A / (SHARPEN_B - 4 * SHARPEN_A)
+			val def2 = 1f * SHARPEN_B / (SHARPEN_B - 4 * SHARPEN_A)
+
+			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
+			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
+			val convolution = ScriptC_convolution(rsContext)
+			convolution._bitmap_width = MainActivity.currentImage!!.width
+			convolution._bitmap_height = MainActivity.currentImage!!.height
+			convolution._matrix_width = defaultMatrixWidth
+			convolution._matrix_height = defaultMatrixHeight
+			convolution._offset = defaultOffset
+			convolution._divisor = 4 * def1 + def2 //in case of default sharpening
+
+			//assign pixels (from here) to *pixels in .rs
+			var pixelsBuilder = Type.Builder(rsContext, Element.I32(rsContext))
+			pixelsBuilder.setX(pixels!!.size)
+			var pixelsAlloc = Allocation.createTyped(rsContext, pixelsBuilder.create())
+			pixelsAlloc.copyFrom(pixels)
+			convolution.bind_pixels(pixelsAlloc)
+
+			//assign defaultChangesInCoordinatesToConsider (from here) to *changes_in_coordinates_to_consider in .rs
+			var changesBuilder = Type.Builder(rsContext, Element.I32(rsContext))
+			changesBuilder.setX(defaultChangesInCoordinatesToConsider.size)
+			var changesAlloc = Allocation.createTyped(rsContext, changesBuilder.create())
+			changesAlloc.copyFrom(defaultChangesInCoordinatesToConsider)
+			convolution.bind_changes_in_coordinates_to_consider(changesAlloc)
+
+			//assign matrix (from here) to *matrix in .rs
+			var matrixBuilder = Type.Builder(rsContext, Element.F32(rsContext))
+			matrixBuilder.setX(defaultMatrixHeight * defaultMatrixWidth)
+			var matrixAlloc = Allocation.createTyped(rsContext, matrixBuilder.create())
+			matrixAlloc.copyFrom(floatArrayOf(0f, def1, 0f, def1, def2, def1, 0f, def1, 0f)) //in case of default sharpening
+			convolution.bind_matrix(matrixAlloc)
+
+			convolution.forEach_convolution(aIn, aOut)
+			aOut.copyTo(bitmap)
+
+			return bitmap
+		}
+
+		override fun onPostExecute(result: Bitmap?) {
+			toast("Sharpening is done")
 			MainActivity.currentImage = result
 			setImageViewAndPixels()
 		}

@@ -10,9 +10,9 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_functional_filters.*
 
 
-const val BRIGHTNESS = 30f
-const val CONTRAST = 1.25f
-const val GAMMA = 1.5f
+const val DEFAULT_BRIGHTNESS = 30f
+const val DEFAULT_CONTRAST = 1.25f
+const val DEFAULT_GAMMA = 1.5f
 
 class FunctionalFiltersActivity : AppCompatActivity() {
 
@@ -90,7 +90,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			var aOut: Allocation = Allocation.createFromBitmap(rsContext, bitmap)
 
 			val brightnessCorrection = ScriptC_brightness(rsContext)
-			brightnessCorrection._brightness = BRIGHTNESS
+			brightnessCorrection._brightness = DEFAULT_BRIGHTNESS
 
 			brightnessCorrection.forEach_brightness_correction(aIn, aOut)
 			aOut.copyTo(bitmap)
@@ -117,7 +117,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
 			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
 			val contrast = ScriptC_contrast(rsContext)
-			contrast._contrast = CONTRAST
+			contrast._contrast = DEFAULT_CONTRAST
 
 			contrast.forEach_contrast_enhancement(aIn, aOut)
 			aOut.copyTo(bitmap)
@@ -144,7 +144,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
 			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
 			val gamma = ScriptC_gamma(rsContext)
-			gamma._gamma = GAMMA
+			gamma._gamma = DEFAULT_GAMMA
 
 			gamma.forEach_gamma_correction(aIn, aOut)
 			aOut.copyTo(bitmap)

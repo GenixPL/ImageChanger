@@ -15,7 +15,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -106,23 +109,26 @@ class MainActivity : AppCompatActivity() {
 			return
 		}
 
-		val root = Environment.getExternalStorageDirectory().toString()
-		val myDir = File("$root/saved_photos")
-		myDir.mkdirs()
+		val storageState = Environment.getExternalStorageState()
+		if (storageState != Environment.MEDIA_MOUNTED) {
+			toast("Storage is not available")
+			return
+		}
 
-		val timeStamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
-		var file = File(myDir, "$timeStamp.jpg")
-
+		val storageDir = Environment.getExternalStorageDirectory().toString()
+		val timeStamp = Timestamp(System.currentTimeMillis())
+		val file = File(storageDir, "Pictures/$timeStamp.jpg")
 
 		try {
 			val stream: OutputStream = FileOutputStream(file)
 
-			currentImage?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+			currentImage!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
 
 			stream.flush()
 			stream.close()
 
 		} catch (e: IOException) {
+			toast("Error occurred during image saving")
 			e.printStackTrace()
 		}
 	}
@@ -146,7 +152,6 @@ class MainActivity : AppCompatActivity() {
 			startActivity(intent)
 		}
 	}
-
 
 
 

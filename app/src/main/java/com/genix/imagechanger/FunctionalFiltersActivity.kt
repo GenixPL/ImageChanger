@@ -6,8 +6,11 @@ import android.os.Bundle
 import android.renderscript.Allocation
 import android.renderscript.RenderScript
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_edit_custom_matrix.*
 import kotlinx.android.synthetic.main.activity_functional_filters.*
 
 
@@ -18,7 +21,7 @@ const val DEFAULT_GAMMA = 1.5f
 class FunctionalFiltersActivity : AppCompatActivity() {
 
 	private var rsContext : RenderScript? = null
-
+	private var currentGamma: Float = 1.5f
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -26,9 +29,24 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 		supportActionBar!!.hide()
 
 		rsContext = RenderScript.create(this)
+		gammaEditText.setText(currentGamma.toString())
 
 		setImageView()
 		initButtons()
+		initEditText()
+	}
+
+	private fun initEditText() {
+		gammaEditText.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(p0: Editable?) {
+				if (p0.toString().isNotEmpty()) {
+					currentGamma = p0.toString().toFloat()
+				}
+			}
+
+			override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+			override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+		})
 	}
 
 	private fun initButtons() {
@@ -163,7 +181,7 @@ class FunctionalFiltersActivity : AppCompatActivity() {
 			var aIn = Allocation.createFromBitmap(rsContext, MainActivity.currentImage)
 			var aOut = Allocation.createFromBitmap(rsContext, bitmap)
 			val gamma = ScriptC_gamma(rsContext)
-			gamma._gamma = DEFAULT_GAMMA
+			gamma._gamma = currentGamma
 
 			gamma.forEach_gamma_correction(aIn, aOut)
 			aOut.copyTo(bitmap)

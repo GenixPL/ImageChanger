@@ -7,12 +7,16 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.Type
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import kotlinx.android.synthetic.main.activity_ordered_dithering.*
 
 class OrderedDitheringActivity : AppCompatActivity() {
@@ -30,6 +34,7 @@ class OrderedDitheringActivity : AppCompatActivity() {
 		setImageView()
 		initButtons()
 		initSpinners()
+		setMatrix()
 
 		rsContext = RenderScript.create(this)
 	}
@@ -82,10 +87,57 @@ class OrderedDitheringActivity : AppCompatActivity() {
 					else -> toast("Wrong number of n")
 				}
 
-				for (i in 0..(matrix.size - 1)) {
-					matrix[i] = matrix[i] / (n * n)
-				}
+				setMatrix()
 			}
+		}
+	}
+
+	private fun setMatrix() {
+		matrixLayout.removeAllViews()
+
+		var i = 0
+		while (i < n) {
+			var horizontalLayout = LinearLayout(this)
+			horizontalLayout.gravity = Gravity.HORIZONTAL_GRAVITY_MASK
+			horizontalLayout.layoutParams = LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				1f
+			)
+
+			var j = 0
+			while (j < n) {
+				var editText = EditText(this)
+				editText.inputType = InputType.TYPE_NUMBER_FLAG_DECIMAL or InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_CLASS_NUMBER
+				editText.layoutParams = LinearLayout.LayoutParams(
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					ViewGroup.LayoutParams.MATCH_PARENT,
+					1f
+				)
+				editText.setText(matrix[i * n + j].toString())
+				editText.gravity = Gravity.CENTER
+				editText.tag = i * n + j
+
+				editText.addTextChangedListener(object : TextWatcher {
+					override fun afterTextChanged(p0: Editable?) {
+						if (p0.toString().isNotEmpty() && p0.toString() != "-") {
+							matrix[editText.tag.toString().toInt()] = p0.toString().toFloat()
+							Log.d("TAG", "matrix:${editText.tag.toString().toInt()} = ${matrix[editText.tag.toString().toInt()]}")
+						}
+					}
+
+					override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+					override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+				})
+
+				horizontalLayout.addView(editText)
+
+				j++
+			}
+
+			matrixLayout.addView(horizontalLayout)
+
+			i++
 		}
 	}
 
@@ -107,12 +159,17 @@ class OrderedDitheringActivity : AppCompatActivity() {
 			odScript._k = k
 			odScript._n = n
 
+			var matrixCopy = matrix
+			for (i in 0..(matrix.size - 1)) {
+				matrixCopy[i] = matrix[i] / (n * n)
+			}
+
 			var matrixBuilder = Type.Builder(rsContext, Element.F32(rsContext))
 			matrixBuilder.setX(matrix.size)
 			var matrixAlloc = Allocation.createTyped(rsContext, matrixBuilder.create())
-			matrixAlloc.copyFrom(matrix)
+			matrixAlloc.copyFrom(matrixCopy)
 			odScript.bind_matrix(matrixAlloc)
-			Log.d("DEBUG: ", matrix.contentToString())
+			Log.d("DEBUG: ", matrixCopy.contentToString())
 
 			odScript.forEach_ordered_dithering(aIn, aOut)
 			aOut.copyTo(bitmap)

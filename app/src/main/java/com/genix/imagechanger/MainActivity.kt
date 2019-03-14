@@ -16,10 +16,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 const val IMAGE_PICK_CODE = 10
@@ -54,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 		importDefaultButton.setOnClickListener { setDefaultAsCurrent() }
 		functionalFiltersButton.setOnClickListener { moveToFunctionalFilters() }
 		convolutionFiltersButton.setOnClickListener { moveToConvolutionFilters() }
+		task2Button.setOnClickListener { moveToLabActivity() }
 	}
 
 	private fun importImage() {
@@ -149,6 +146,16 @@ class MainActivity : AppCompatActivity() {
 
 		} else {
 			val intent = Intent(this, ConvolutionFiltersActivity::class.java)
+			startActivity(intent)
+		}
+	}
+
+	private fun moveToLabActivity() {
+		if (currentImage == null) {
+			toast("There is no image currently")
+
+		} else {
+			val intent = Intent(this, LabActivity::class.java)
 			startActivity(intent)
 		}
 	}

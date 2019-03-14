@@ -7,6 +7,13 @@
                                              android:weightSum="1.0"
                                              tools:context=".MainActivity" android:id="@+id/constraintLayout2">
 
+	<Button
+			android:text="task 2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/task2Button" android:layout_marginBottom="8dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+			app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"/>
 	<LinearLayout
 			android:orientation="horizontal"
 			android:layout_width="395dp"
@@ -56,10 +63,10 @@
 			android:orientation="horizontal"
 			android:layout_width="395dp"
 			android:layout_height="wrap_content"
-			android:layout_marginBottom="8dp"
-			app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
 			android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-			android:layout_marginStart="8dp" android:id="@+id/linearLayout4">
+			android:layout_marginStart="8dp" android:id="@+id/linearLayout4" android:layout_marginBottom="8dp"
+			app:layout_constraintBottom_toTopOf="@+id/task2Button">
 
 		<Button
 				android:layout_weight="1"

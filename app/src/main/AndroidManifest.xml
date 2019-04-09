@@ -13,6 +13,10 @@
 			android:supportsRtl="true"
 			android:theme="@style/AppTheme"
 			tools:ignore="GoogleAppIndexingWarning">
+		<activity android:name=".task3.DrawLineActivity">
+		</activity>
+		<activity android:name=".task3.Task3Activity">
+		</activity>
 		<activity android:name=".OrderedDitheringActivity">
 		</activity>
 		<activity android:name=".LabActivity">

@@ -7,7 +7,6 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.Type
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.InputType
@@ -44,7 +43,7 @@ class OrderedDitheringActivity : AppCompatActivity() {
 	}
 
 	private fun initButtons() {
-		applyButton.setOnClickListener { BackgroundOrderedDithering().execute() }
+		applyN1Button.setOnClickListener { BackgroundOrderedDithering().execute() }
 	}
 
 	private fun initSpinners() {

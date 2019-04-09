@@ -109,7 +109,6 @@ class EditCustomMatrixActivity : AppCompatActivity() {
 
 					var width = ConvolutionFiltersActivity.matrixWidth
 					var height = ConvolutionFiltersActivity.matrixHeight
-					Log.d("TAG", "w:$width h:$height")
 					if (anchor < 0 || anchor > ((width * height) - 1)) {
 						toast("Anchor must be in range of 0-${(width * height) - 1}")
 						anchorEditText.setText("0")

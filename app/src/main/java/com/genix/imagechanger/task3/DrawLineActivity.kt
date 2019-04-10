@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.Toast
 import com.genix.imagechanger.MainActivity
 import com.genix.imagechanger.R
@@ -16,11 +15,11 @@ import kotlin.math.pow
 
 class DrawLineActivity : AppCompatActivity() {
 
-	private var x1: Int = 0
-	private var y1: Int = 0
-	private var x2: Int = 0
-	private var y2: Int = 0
-	private var n: Int = 3
+	private var x1: Int = 50
+	private var y1: Int = 50
+	private var x2: Int = 200
+	private var y2: Int = 200
+	private var n: Int = 0
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -30,7 +29,6 @@ class DrawLineActivity : AppCompatActivity() {
 		setImageView()
 		initButtons()
 		initEditTexts()
-		drawHorizontalLine(20, 30, 50, 30)
 	}
 
 	private fun initEditTexts() {
@@ -129,7 +127,7 @@ class DrawLineActivity : AppCompatActivity() {
 	}
 
 	private fun initButtons() {
-		applyN1Button.setOnClickListener { drawLine() }
+		applyButton.setOnClickListener { drawLine() }
 	}
 
 	private fun setImageView() {
@@ -244,7 +242,6 @@ class DrawLineActivity : AppCompatActivity() {
 			putPixel(img, x, y)
 		}
 
-
 		MainActivity.currentImage = img
 		setImageView()
 	}
@@ -330,10 +327,6 @@ class DrawLineActivity : AppCompatActivity() {
 
 				val curX: Double = i - r - (x - r)
 				val curY: Double = j - r - (y - r)
-
-				if (x == 20 && y == 30) {
-					Log.d("TAG", "x:$curX, y:$curY" + (curX.pow(2) + curY.pow(2) <= r.pow(2)).toString())
-				}
 
 				if (curX.pow(2) + curY.pow(2) <= r.pow(2)) {
 					img.setPixel(i, j, Color.BLACK)

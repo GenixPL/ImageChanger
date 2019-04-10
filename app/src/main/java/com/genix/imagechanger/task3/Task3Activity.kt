@@ -25,10 +25,15 @@ class Task3Activity : AppCompatActivity() {
 
 	private fun initButtons() {
 		drawLineButton.setOnClickListener { moveToDrawLineActivity() }
+		drawCircleButton.setOnClickListener { moveToDrawCircleActivity() }
 	}
 
 	private fun moveToDrawLineActivity() {
 		startActivity(Intent(this, DrawLineActivity::class.java))
+	}
+
+	private fun moveToDrawCircleActivity() {
+		startActivity(Intent(this, DrawCircleActivity::class.java))
 	}
 
 	private fun setImageView() {

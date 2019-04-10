@@ -43,7 +43,7 @@ class OrderedDitheringActivity : AppCompatActivity() {
 	}
 
 	private fun initButtons() {
-		applyN1Button.setOnClickListener { BackgroundOrderedDithering().execute() }
+		applyButton.setOnClickListener { BackgroundOrderedDithering().execute() }
 	}
 
 	private fun initSpinners() {

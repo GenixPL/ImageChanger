@@ -28,8 +28,6 @@ class DrawLineActivity : AppCompatActivity() {
 		setImageView()
 		initButtons()
 		initEditTexts()
-
-		midpointLine(20, 200, 200, 20)
 	}
 
 	private fun initEditTexts() {
@@ -128,7 +126,7 @@ class DrawLineActivity : AppCompatActivity() {
 	}
 
 	private fun initButtons() {
-			applyN1Button.setOnClickListener { drawLine() }
+		applyN1Button.setOnClickListener { drawLine() }
 	}
 
 	private fun setImageView() {
@@ -140,6 +138,9 @@ class DrawLineActivity : AppCompatActivity() {
 	}
 
 	private fun drawLine() {
+		val right = MainActivity.currentImage!!.width - 1
+		val bottom = MainActivity.currentImage!!.height - 1
+
 		if (x1 == x2) {
 			drawVerticalLine(x1, y1, x2, y2)
 			return
@@ -152,20 +153,20 @@ class DrawLineActivity : AppCompatActivity() {
 
 		if (x1 < x2) {
 			if (y1 < y2) {
-
+				midpointLine(x1, y1, x2, y2)
 				return
 			} else {
-
+				midpointLineMirrorTopBottom(x1, bottom  - y1, x2, bottom - y2)
 				return
 			}
 		}
 
 		if (x1 > x2) {
 			if (y1 < y2) {
-
+				midpointLineMirrorLeftRight(right - x1, y1, right - x2, y2)
 				return
 			} else {
-
+				midpointLine(x2, y2, x1, y1)
 				return
 			}
 		}
@@ -174,7 +175,7 @@ class DrawLineActivity : AppCompatActivity() {
 	private fun drawVerticalLine(x1: Int, y1: Int, x2: Int, y2: Int) {
 		var smaller: Int
 		var bigger: Int
-		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888,true)
+		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
 
 		if (y1 < y2) {
 			smaller = y1
@@ -196,7 +197,7 @@ class DrawLineActivity : AppCompatActivity() {
 	private fun drawHorizontalLine(x1: Int, y1: Int, x2: Int, y2: Int) {
 		var smaller: Int
 		var bigger: Int
-		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888,true)
+		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
 
 		if (x1 < x2) {
 			smaller = x1
@@ -216,30 +217,92 @@ class DrawLineActivity : AppCompatActivity() {
 	}
 
 	private fun midpointLine(x1: Int, y1: Int, x2: Int, y2: Int) {
-		val dx = x2 - x1
-		val dy = y2 - y1
-
-		var d = dy - dx/2 //initial value for decision parameter
-
+		var dx = x2 - x1
+		var dy = y2 - y1
+		var d = 2 * dy - dx // initial value of d
+		var dE = 2 * dy // increment used when moving to E
+		var dNE = 2 * (dy - dx) // increment used when moving to NE
 		var x = x1
-		var y = MainActivity.currentImage!!.height - y1 - 1
+		var y = y1
 
-		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888,true)
+		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
 
-		putPixel(img, x, MainActivity.currentImage!!.height - y)
+		putPixel(img, x, y)
 		while (x < x2) {
-			x++
-
 			if (d < 0) { // move to E
-				d += dy
+				d += dE
+				x++
 
 			} else { // move to NE
-				d += d - dy + dx
-				y++
+				d += dNE
+				++x
+				++y
 			}
-
-			putPixel(img, x, MainActivity.currentImage!!.height - y - 1)
+			putPixel(img, x, y)
 		}
+
+
+		MainActivity.currentImage = img
+		setImageView()
+	}
+
+	private fun midpointLineMirrorLeftRight(x1: Int, y1: Int, x2: Int, y2: Int) {
+		var dx = x2 - x1
+		var dy = y2 - y1
+		var d = 2 * dy - dx // initial value of d
+		var dE = 2 * dy // increment used when moving to E
+		var dNE = 2 * (dy - dx) // increment used when moving to NE
+		var x = x1
+		var y = y1
+
+		val right = MainActivity.currentImage!!.width - 1
+		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
+
+		putPixel(img, right - x, y)
+		while (x < x2) {
+			if (d < 0) { // move to E
+				d += dE
+				x++
+
+			} else { // move to NE
+				d += dNE
+				++x
+				++y
+			}
+			putPixel(img, right - x, y)
+		}
+
+
+		MainActivity.currentImage = img
+		setImageView()
+	}
+
+	private fun midpointLineMirrorTopBottom(x1: Int, y1: Int, x2: Int, y2: Int) {
+		var dx = x2 - x1
+		var dy = y2 - y1
+		var d = 2 * dy - dx // initial value of d
+		var dE = 2 * dy // increment used when moving to E
+		var dNE = 2 * (dy - dx) // increment used when moving to NE
+		var x = x1
+		var y = y1
+
+		val bottom = MainActivity.currentImage!!.height - 1
+		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
+
+		putPixel(img, x, bottom - y)
+		while (x < x2) {
+			if (d < 0) { // move to E
+				d += dE
+				x++
+
+			} else { // move to NE
+				d += dNE
+				++x
+				++y
+			}
+			putPixel(img, x, bottom - y)
+		}
+
 
 		MainActivity.currentImage = img
 		setImageView()

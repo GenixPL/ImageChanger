@@ -18,6 +18,11 @@ class Task3Activity : AppCompatActivity() {
 		initButtons()
 	}
 
+	override fun onPostResume() {
+		setImageView()
+		super.onPostResume()
+	}
+
 	private fun initButtons() {
 		drawLineButton.setOnClickListener { moveToDrawLineActivity() }
 	}

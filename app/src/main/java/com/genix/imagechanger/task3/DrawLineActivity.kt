@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import com.genix.imagechanger.MainActivity
 import com.genix.imagechanger.R
 import kotlinx.android.synthetic.main.activity_draw_line.*
+import kotlin.math.pow
 
 
 class DrawLineActivity : AppCompatActivity() {
@@ -18,7 +20,7 @@ class DrawLineActivity : AppCompatActivity() {
 	private var y1: Int = 0
 	private var x2: Int = 0
 	private var y2: Int = 0
-	private var n: Int = 1
+	private var n: Int = 3
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -28,6 +30,7 @@ class DrawLineActivity : AppCompatActivity() {
 		setImageView()
 		initButtons()
 		initEditTexts()
+		drawHorizontalLine(20, 30, 50, 30)
 	}
 
 	private fun initEditTexts() {
@@ -156,7 +159,7 @@ class DrawLineActivity : AppCompatActivity() {
 				midpointLine(x1, y1, x2, y2)
 				return
 			} else {
-				midpointLineMirrorTopBottom(x1, bottom  - y1, x2, bottom - y2)
+				midpointLineMirrorTopBottom(x1, bottom - y1, x2, bottom - y2)
 				return
 			}
 		}
@@ -309,7 +312,34 @@ class DrawLineActivity : AppCompatActivity() {
 	}
 
 	private fun putPixel(img: Bitmap, x: Int, y: Int) {
-		img.setPixel(x, y, Color.BLACK)
+		val height = MainActivity.currentImage!!.height - 1
+		val width = MainActivity.currentImage!!.width - 1
+
+		val lowerX = x - n
+		val upperX = x - n + (n * 2)
+		val lowerY = y - n
+		val upperY = y - n + (n * 2)
+
+		val r: Double = n + 0.5
+
+		for (i in lowerX..upperX) {
+			for (j in lowerY..upperY) {
+				if (i < 0 || i > width || j < 0 || j > height) {
+					continue
+				}
+
+				val curX: Double = i - r - (x - r)
+				val curY: Double = j - r - (y - r)
+
+				if (x == 20 && y == 30) {
+					Log.d("TAG", "x:$curX, y:$curY" + (curX.pow(2) + curY.pow(2) <= r.pow(2)).toString())
+				}
+
+				if (curX.pow(2) + curY.pow(2) <= r.pow(2)) {
+					img.setPixel(i, j, Color.BLACK)
+				}
+			}
+		}
 	}
 
 

@@ -10,7 +10,9 @@ import android.widget.Toast
 import com.genix.imagechanger.MainActivity
 import com.genix.imagechanger.R
 import kotlinx.android.synthetic.main.activity_draw_circle.*
+import kotlin.math.ceil
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 
 class DrawCircleActivity : AppCompatActivity() {
@@ -32,6 +34,7 @@ class DrawCircleActivity : AppCompatActivity() {
 
 	private fun initButtons() {
 		applyButton.setOnClickListener { midpointCircle(x, y, r) }
+		wuCircleButton.setOnClickListener { drawWuCircle(x, y, r) }
 	}
 
 	private fun initEditTexts() {
@@ -124,6 +127,7 @@ class DrawCircleActivity : AppCompatActivity() {
 		putPixel(img, centX - y, centY - x)
 		putPixel(img, centX - y, centY + x)
 		putPixel(img, centX - x, centY + y)
+
 		while (y > x) {
 			if (d < 0) { //move to E
 				d += 2 * x + 3
@@ -134,6 +138,7 @@ class DrawCircleActivity : AppCompatActivity() {
 			}
 
 			x++
+
 			putPixel(img, centX + x, centY + y)
 			putPixel(img, centX + y, centY + x)
 			putPixel(img, centX + y, centY - x)
@@ -146,6 +151,71 @@ class DrawCircleActivity : AppCompatActivity() {
 
 		MainActivity.currentImage = img
 		setImageView()
+	}
+
+	private fun drawWuCircle(centX: Int, centY: Int, r: Int) {
+		val img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
+
+		val l = Color.BLACK /*Line color*/
+		val B = img.getPixel(centX, centY) /*Background Color*/
+		var x = r
+		var y = 0
+
+		putPixel(img, centX + x, centY + y, l)
+		putPixel(img, centX + y, centY + x, l)
+		putPixel(img, centX + y, centY - x, l)
+		putPixel(img, centX + x, centY - y, l)
+		putPixel(img, centX - x, centY - y, l)
+		putPixel(img, centX - y, centY - x, l)
+		putPixel(img, centX - y, centY + x, l)
+		putPixel(img, centX - x, centY + y, l)
+
+		while (x > y) {
+			++y
+			x = ceil(sqrt((r * r - y * y).toDouble())).toInt()
+			val T: Float = ceil(sqrt(r.toFloat().pow(2) - y.toFloat().pow(2))) -
+					sqrt(r.toFloat().pow(2) - y.toFloat().pow(2))
+			val c2 = (l * (1 - T) + B * T).toInt()
+			val c1 = (l * T + B * (1 - T)).toInt()
+
+			putPixel(img, centX + x, centY + y, c2)
+			putPixel(img, centX + x - 1, centY + y, c1)
+
+			putPixel(img, centX + y, centY + x, c2)
+			putPixel(img, centX + y - 1, centY + x, c1)
+
+			putPixel(img, centX + y, centY - x, c2)
+			putPixel(img, centX + y - 1, centY - x, c1)
+
+			putPixel(img, centX + x, centY - y, c2)
+			putPixel(img, centX + x - 1, centY - y, c1)
+
+			putPixel(img, centX - x, centY - y, c2)
+			putPixel(img, centX - x + 1, centY - y, c1)
+
+			putPixel(img, centX - y, centY - x, c2)
+			putPixel(img, centX - y + 1, centY - x, c1)
+
+			putPixel(img, centX - y, centY + x, c2)
+			putPixel(img, centX - y + 1, centY + x, c1)
+
+			putPixel(img, centX - x, centY + y, c2)
+			putPixel(img, centX - x + 1, centY + y, c1)
+		}
+
+		MainActivity.currentImage = img
+		setImageView()
+	}
+
+	private fun putPixel(img: Bitmap, x: Int, y: Int, color: Int) {
+		val height = MainActivity.currentImage!!.height - 1
+		val width = MainActivity.currentImage!!.width - 1
+
+		if (x < 0 || x > width || y < 0 || y > height) {
+			return
+		}
+
+		img.setPixel(x, y, color)
 	}
 
 	private fun putPixel(img: Bitmap, x: Int, y: Int) {

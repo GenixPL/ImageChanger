@@ -3,9 +3,11 @@ package com.genix.imagechanger.task3
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.ImageView
 import android.widget.Toast
 import com.genix.imagechanger.MainActivity
 import com.genix.imagechanger.R
@@ -108,7 +110,13 @@ class DrawCircleActivity : AppCompatActivity() {
 		drawCircleImageView.setImageBitmap(MainActivity.currentImage)
 
 		drawCircleImageView.setOnClickListener {
-			toast("x:$x, y:$y, r:$r, n:$n")
+			val mBuilder = AlertDialog.Builder(this)
+			val mView = layoutInflater.inflate(R.layout.dialog_zoomable_image, null)
+			val photoView: ImageView = mView.findViewById(R.id.zoomableImageView)
+			photoView.setImageBitmap(MainActivity.currentImage!!)
+			mBuilder.setView(mView)
+			val mDialog = mBuilder.create()
+			mDialog.show()
 		}
 	}
 

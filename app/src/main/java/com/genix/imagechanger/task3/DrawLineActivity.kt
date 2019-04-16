@@ -1,7 +1,6 @@
 package com.genix.imagechanger.task3
 
-import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.*
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -12,6 +11,7 @@ import android.widget.Toast
 import com.genix.imagechanger.MainActivity
 import com.genix.imagechanger.R
 import kotlinx.android.synthetic.main.activity_draw_line.*
+import kotlin.math.abs
 import kotlin.math.pow
 
 
@@ -130,6 +130,8 @@ class DrawLineActivity : AppCompatActivity() {
 
 	private fun initButtons() {
 		applyButton.setOnClickListener { drawLine() }
+		labButton.setOnClickListener { lab() }
+		wuLineButton.setOnClickListener { drawAliasedLine() }
 	}
 
 	private fun setImageView() {
@@ -157,6 +159,11 @@ class DrawLineActivity : AppCompatActivity() {
 
 		if (y1 == y2) {
 			drawHorizontalLine(x1, y1, x2, y2)
+			return
+		}
+
+		if (abs((x2 - x1)) < abs((y2 - y1))) {
+			toast("difference in xs should be bigger or equal than in ys, because midpoint won't work otherwise")
 			return
 		}
 
@@ -341,6 +348,117 @@ class DrawLineActivity : AppCompatActivity() {
 				}
 			}
 		}
+	}
+
+	private fun drawAliasedLine() {
+
+		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
+
+		drawWuLine(img, x1, y1, x2, y2)
+		MainActivity.currentImage = img
+		setImageView()
+	}
+
+
+	private fun lab() {
+		val m = 4
+
+		val matrix = ColorMatrix()
+		matrix.setSaturation(0f)
+
+		val filter = ColorMatrixColorFilter(matrix)
+		MainActivity.currentImage = toGrayScale(MainActivity.currentImage!!)
+
+		MainActivity.currentImage = getSuperBitmap(MainActivity.currentImage!!, m)
+		n *= m
+		x1 *= m
+		y1 *= m
+		x2 *= m
+		y2 *= m
+		drawLine()
+		n /= m
+		x1 /= m
+		y1 /= m
+		x2 /= m
+		y2 /= m
+		MainActivity.currentImage = getShrankBitmap(MainActivity.currentImage!!, m)
+
+		setImageView()
+	}
+
+	private fun toGrayScale(bmpOriginal: Bitmap): Bitmap {
+		val width: Int
+		val height: Int
+		height = bmpOriginal.height
+		width = bmpOriginal.width
+
+		val bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+		val c = Canvas(bmpGrayscale)
+		val paint = Paint()
+		val cm = ColorMatrix()
+		cm.setSaturation(0f)
+		val f = ColorMatrixColorFilter(cm)
+		paint.setColorFilter(f)
+		c.drawBitmap(bmpOriginal, 0f, 0f, paint)
+		return bmpGrayscale
+	}
+
+	private fun getShrankBitmap(bmp: Bitmap, m: Int): Bitmap {
+		val width = bmp.width / m
+		val height = bmp.height / m
+
+		val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+		for (i in 0 until (width)) {
+			for (j in 0 until (height)) {
+				val x = i * m
+				val y = j * m
+
+				var col = 0
+				for (q in 0 until m) {
+					for (w in 0 until m) {
+						col += getGray(bmp.getPixel(x + q, y + w))
+					}
+				}
+
+				col /= (m * m)
+
+				bitmap.setPixel(i, j, Color.rgb(col, col, col))
+			}
+		}
+
+		return bitmap
+	}
+
+	private fun getGray(pix: Int): Int {
+		val red = Color.red(pix)
+		val green = Color.green(pix)
+		val blue = Color.blue(pix)
+
+		return ((0.3 * red) + (0.59 * green) + (0.11 * blue)).toInt()
+	}
+
+	private fun getSuperBitmap(bmp: Bitmap, m: Int): Bitmap {
+		val width = bmp.width
+		val height = bmp.height
+
+		val bitmap = Bitmap.createBitmap(width * m, height * m, Bitmap.Config.ARGB_8888)
+
+		for (i in 0 until (width)) {
+			for (j in 0 until (height)) {
+				val x = i * m
+				val y = j * m
+				val pix = bmp.getPixel(i, j)
+
+				for (q in 0 until m) {
+					for (w in 0 until m) {
+						bitmap.setPixel(x + q, y + w, pix)
+					}
+				}
+			}
+		}
+
+		return bitmap
 	}
 
 

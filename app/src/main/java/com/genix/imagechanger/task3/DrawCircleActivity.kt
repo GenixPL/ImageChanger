@@ -165,7 +165,6 @@ class DrawCircleActivity : AppCompatActivity() {
 		val img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
 
 		val l = Color.BLACK /*Line color*/
-		val B = img.getPixel(centX, centY) /*Background Color*/
 		var x = r
 		var y = 0
 
@@ -179,12 +178,17 @@ class DrawCircleActivity : AppCompatActivity() {
 		putPixel(img, centX - x, centY + y, l)
 
 		while (x > y) {
-			++y
+			y++
 			x = ceil(sqrt((r * r - y * y).toDouble())).toInt()
+
+			val b = img.getPixel(x, y)
 			val T: Float = ceil(sqrt(r.toFloat().pow(2) - y.toFloat().pow(2))) -
 					sqrt(r.toFloat().pow(2) - y.toFloat().pow(2))
-			val c2 = (l * (1 - T) + B * T).toInt()
-			val c1 = (l * T + B * (1 - T)).toInt()
+			var c2 = (l * (1 - T) + b * T).toInt()
+			var c1 = (l * T + b * (1 - T)).toInt()
+
+			c2 = Color.rgb(getGray(c2), getGray(c2), getGray(c2))
+			c1 = Color.rgb(getGray(c1), getGray(c1), getGray(c1))
 
 			putPixel(img, centX + x, centY + y, c2)
 			putPixel(img, centX + x - 1, centY + y, c1)
@@ -213,6 +217,14 @@ class DrawCircleActivity : AppCompatActivity() {
 
 		MainActivity.currentImage = img
 		setImageView()
+	}
+
+	private fun getGray(pix: Int): Int {
+		val red = Color.red(pix)
+		val green = Color.green(pix)
+		val blue = Color.blue(pix)
+
+		return ((0.3 * red) + (0.59 * green) + (0.11 * blue)).toInt()
 	}
 
 	private fun putPixel(img: Bitmap, x: Int, y: Int, color: Int) {

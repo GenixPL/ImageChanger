@@ -352,7 +352,7 @@ class DrawLineActivity : AppCompatActivity() {
 
 	private fun drawAliasedLine() {
 
-		var img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
+		val img: Bitmap = MainActivity.currentImage!!.copy(Bitmap.Config.ARGB_8888, true)
 
 		drawWuLine(img, x1, y1, x2, y2)
 		MainActivity.currentImage = img
@@ -360,6 +360,7 @@ class DrawLineActivity : AppCompatActivity() {
 	}
 
 
+	/* === LAB === */
 	private fun lab() {
 		val m = 4
 
@@ -462,6 +463,7 @@ class DrawLineActivity : AppCompatActivity() {
 	}
 
 
+	/* === OTHER === */
 	private fun toast(message: String) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 	}

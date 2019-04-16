@@ -182,37 +182,37 @@ class DrawCircleActivity : AppCompatActivity() {
 			x = ceil(sqrt((r * r - y * y).toDouble())).toInt()
 
 			val b = img.getPixel(x, y)
-			val T: Float = ceil(sqrt(r.toFloat().pow(2) - y.toFloat().pow(2))) -
-					sqrt(r.toFloat().pow(2) - y.toFloat().pow(2))
-			var c2 = (l * (1 - T) + b * T).toInt()
-			var c1 = (l * T + b * (1 - T)).toInt()
+			val t: Float = ceil(sqrt((r * r - y * y).toDouble())).toFloat() - sqrt((r * r - y * y).toFloat())
+
+			var c2 = (l * (1 - t) + b * t).toInt()
+			var c1 = (l * t + b * (1 - t)).toInt()
 
 			c2 = Color.rgb(getGray(c2), getGray(c2), getGray(c2))
 			c1 = Color.rgb(getGray(c1), getGray(c1), getGray(c1))
 
 			putPixel(img, centX + x, centY + y, c2)
-			putPixel(img, centX + x - 1, centY + y, c1)
+			putPixel(img, centX + x + 1, centY + y, c1)
 
 			putPixel(img, centX + y, centY + x, c2)
-			putPixel(img, centX + y - 1, centY + x, c1)
+			putPixel(img, centX + y + 1, centY + x, c1)
 
 			putPixel(img, centX + y, centY - x, c2)
-			putPixel(img, centX + y - 1, centY - x, c1)
+			putPixel(img, centX + y + 1, centY - x, c1)
 
 			putPixel(img, centX + x, centY - y, c2)
-			putPixel(img, centX + x - 1, centY - y, c1)
+			putPixel(img, centX + x + 1, centY - y, c1)
 
 			putPixel(img, centX - x, centY - y, c2)
-			putPixel(img, centX - x + 1, centY - y, c1)
+			putPixel(img, centX - x - 1, centY - y, c1)
 
 			putPixel(img, centX - y, centY - x, c2)
-			putPixel(img, centX - y + 1, centY - x, c1)
+			putPixel(img, centX - y - 1, centY - x, c1)
 
 			putPixel(img, centX - y, centY + x, c2)
-			putPixel(img, centX - y + 1, centY + x, c1)
+			putPixel(img, centX - y - 1, centY + x, c1)
 
 			putPixel(img, centX - x, centY + y, c2)
-			putPixel(img, centX - x + 1, centY + y, c1)
+			putPixel(img, centX - x - 1, centY + y, c1)
 		}
 
 		MainActivity.currentImage = img

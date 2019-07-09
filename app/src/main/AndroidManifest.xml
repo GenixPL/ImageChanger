@@ -13,6 +13,8 @@
 			android:supportsRtl="true"
 			android:theme="@style/AppTheme"
 			tools:ignore="GoogleAppIndexingWarning">
+		<activity android:name=".task4.Task4Activity">
+		</activity>
 		<activity android:name=".task3.DrawCircleActivity">
 		</activity>
 		<activity android:name=".task3.DrawLineActivity">

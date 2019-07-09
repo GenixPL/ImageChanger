@@ -121,5 +121,12 @@
 			android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintStart_toEndOf="@+id/task2Button" android:layout_marginStart="8dp"
 			style="@style/Widget.AppCompat.Button.Borderless"/>
+	<Button
+			android:text="task 4"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/task4Button" app:layout_constraintStart_toEndOf="@+id/task3Button"
+			android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
+			app:layout_constraintBottom_toBottomOf="parent" style="@style/Widget.AppCompat.Button.Borderless"/>
 
 </android.support.constraint.ConstraintLayout>

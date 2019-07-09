@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.genix.imagechanger.task3.Task3Activity
+import com.genix.imagechanger.task4.Task4Activity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -53,6 +54,8 @@ class MainActivity : AppCompatActivity() {
 		convolutionFiltersButton.setOnClickListener { moveToConvolutionFilters() }
 		task2Button.setOnClickListener { moveToLabActivity() }
 		task3Button.setOnClickListener { moveToTask3Activity() }
+		task4Button.setOnClickListener { moveToTask4Activity() }
+
 	}
 
 	private fun importImage() {
@@ -168,6 +171,16 @@ class MainActivity : AppCompatActivity() {
 
 		} else {
 			val intent = Intent(this, Task3Activity::class.java)
+			startActivity(intent)
+		}
+	}
+
+	private fun moveToTask4Activity() {
+		if (currentImage == null) {
+			toast("There is no image currently")
+
+		} else {
+			val intent = Intent(this, Task4Activity::class.java)
 			startActivity(intent)
 		}
 	}
